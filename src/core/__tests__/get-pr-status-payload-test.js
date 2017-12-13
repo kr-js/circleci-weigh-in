@@ -1,9 +1,8 @@
 import test from 'ava';
 import expect from 'expect';
-import subject from '../get-pr-status-payload';
-import R from 'ramda';
+import getPrStatusPayload from '../get-pr-status-payload';
 
-const fac = (opts = {}) => ({
+const subject = (opts = {}) => getPrStatusPayload({
   assetDiffs: {
     'app.js': {
       filename: 'app.js',
@@ -18,13 +17,13 @@ const fac = (opts = {}) => ({
 });
 
 test("sets state to 'success' when no failures", () => {
-  const {state: actual} = R.pipe(fac, subject)({thresholdFailures: []});
+  const {state: actual} = subject({thresholdFailures: []});
 
   expect(actual).toEqual('success');
 });
 
 test("sets state to 'failure' when there are failures", () => {
-  const {state: actual} = R.pipe(fac, subject)({
+  const {state: actual} = subject({
     thresholdFailures: [{message: 'file3 is too big'}]
   });
 
@@ -32,7 +31,7 @@ test("sets state to 'failure' when there are failures", () => {
 });
 
 test('sets context to label', () => {
-  const {context: actual} = R.pipe(fac, subject)({
+  const {context: actual} = subject({
     label: 'asset sizes'
   });
 
@@ -40,7 +39,7 @@ test('sets context to label', () => {
 });
 
 test('sets targetUrl to targetUrl', () => {
-  const {targetUrl: actual} = R.pipe(fac, subject)({
+  const {targetUrl: actual} = subject({
     targetUrl: 'http://circleci.com/my-repo/242'
   });
 
@@ -48,13 +47,13 @@ test('sets targetUrl to targetUrl', () => {
 });
 
 test("defaults targetUrl to ''", () => {
-  const {targetUrl: actual} = R.pipe(fac, subject)();
+  const {targetUrl: actual} = subject();
 
   expect(actual).toEqual('');
 });
 
 test('sets description to concatenated failure messages when there are failures', () => {
-  const {description: actual} = R.pipe(fac, subject)({
+  const {description: actual} = subject({
     thresholdFailures: [
       {message: 'file2.js is too big'},
       {message: 'vendor asset is too big'}
@@ -65,7 +64,7 @@ test('sets description to concatenated failure messages when there are failures'
 });
 
 test('sets description to formatted asset diffs when there are no failures', () => {
-  const {description: actual} = R.pipe(fac, subject)({
+  const {description: actual} = subject({
     assetDiffs: {
       'app.js': {
         difference: -734729,
@@ -85,7 +84,7 @@ test('sets description to formatted asset diffs when there are no failures', () 
 
 test('truncates description to 140 characters (using ellipsis)', () => {
   const message = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.";
-  const {description: actual} = R.pipe(fac, subject)({
+  const {description: actual} = subject({
     thresholdFailures: [{message}]
   });
 
