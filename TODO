@@ -27,3 +27,8 @@ underlying Reader's run method.
 Add terminology:
 Asset: object representation of the asset
 Asset-file: the physical file on the file-system
+
+Upgrade to babel7. In the meantime, I have some workarounds (hacks) to get the pipeline operator to work.
+1. Delete node_modules/babel-eslint/node_modules/babylon/
+2. Delete node_modules/babel-core/node_modules/babylon/
+3. Add "pipelineOperator" to list of ecmascript features in node_modules/babel-eslint/index.js

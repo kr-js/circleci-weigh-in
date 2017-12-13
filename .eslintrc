@@ -15,3 +15,11 @@ rules:
 env:
   node: true
   browser: false
+parser: 'babel-eslint'
+parserOptions:
+  ecmaVersion: 6
+  sourceType: module
+  ecmaFeatures:
+    jsx: true
+    pipelineOperator: true
+
