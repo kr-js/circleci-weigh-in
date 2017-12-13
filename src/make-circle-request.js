@@ -17,15 +17,13 @@ export default ({path, url, fetchOpts = {}, raw = false}) =>
       ...R.omit('headers', fetchOpts)
     })
       .catch(response =>
-        R.pipe(CircleCiFetchErr, a => Promise.reject(a))(finalUrl, response)
+        CircleCiFetchErr(finalUrl, response) |> a => Promise.reject(a)
       )
       .then(response => {
         if(response.ok) return response.json();
 
-        return R.pipe(CircleCiInvalidResponseErr, a => Promise.reject(a))(
-          finalUrl,
-          response.statusText
-        );
+        return CircleCiInvalidResponseErr(finalUrl, response.statusText)
+          |> a => Promise.reject(a);
       })
       .then(raw ? a => a : circleDeserializer);
   });

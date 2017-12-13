@@ -50,10 +50,12 @@ export const createResponseSequence = (opts = {}) => {
 
 // Factory which makes this easy to test.
 const subject = ({responseData, repoOwner, repoName, ...opts} = {}) => {
-  const fakeFetch = R.pipe(createResponseSequence, FakeFetch)({
+  const fakeFetch = {
     artifactPath: 'blah8372blah/dist/app.js',
     ...responseData
-  });
+  }
+    |> createResponseSequence
+    |> FakeFetch;
 
   return R.pipe(optsFac, retrieveAssetSizes)({
     assetSizesFilepath: 'dist/app.js',

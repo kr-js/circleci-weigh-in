@@ -33,11 +33,10 @@ export default ({pullRequestId, assetSizesFilepath}) =>
 
       return getRecentBuilds(baseBranch).chain(recentBuilds => {
         if(recentBuilds.length === 0) {
-          return R.pipe(
-            NoRecentBuildsFoundErr,
-            Either.Left,
-            ReaderPromise.of
-          )(baseBranch);
+          return baseBranch
+            |> NoRecentBuildsFoundErr
+            |> Either.Left
+            |> ReaderPromise.of;
         }
 
         const [firstItem] = recentBuilds;
@@ -50,11 +49,9 @@ export default ({pullRequestId, assetSizesFilepath}) =>
           const assetSizeArtifact = buildArtifacts
             .find(artifact => artifact.path.match(artifactPathRegExp));
           if(!assetSizeArtifact) {
-            return R.pipe(
-              NoAssetStatsArtifactFoundErr,
-              Either.Left,
-              ReaderPromise.of
-            )(baseBranch, buildNumber);
+            return NoAssetStatsArtifactFoundErr(baseBranch, buildNumber)
+              |> Either.Left
+              |> ReaderPromise.of;
           }
 
           return getAssetSizeArtifact(assetSizeArtifact.url).map(Either.Right);

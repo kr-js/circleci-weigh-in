@@ -10,11 +10,13 @@ import {
 import circleciWeighIn from '../circleci-weigh-in';
 import ReaderPromise from '../core/reader-promise';
 
+const RightReaderPromise = R.pipe(Either.Right, ReaderPromise.of);
+
 const subject = (opts = {}) => {
   const {
     logError = console.error,
     logMessage = console.log,
-    getFileStats = R.pipe(a => Promise.resolve(a), R.always)({size: 452}),
+    getFileStats = Promise.resolve({size: 452}) |> R.always,
     ...rest
   } = opts;
 
@@ -33,7 +35,7 @@ const subject = (opts = {}) => {
         filename: 'app.js',
         path: 'dist/app.js'
       }]),
-      retrieveAssetSizes: () => R.pipe(Either.Right, ReaderPromise.of)({
+      retrieveAssetSizes: () => RightReaderPromise({
         'app.js': {
           size: 300,
           path: 'dist/app.js'
@@ -74,7 +76,7 @@ test('happy path (makes artifact directory, writes asset stats to file, and writ
       writeAssetStats: writeAssetStatsSpy,
       makeArtifactDirectory: makeArtifactDirectorySpy,
       readManifest: () => ReaderPromise.of({'app.js': 'app.js'}),
-      retrieveAssetSizes: () => R.pipe(Either.Right, ReaderPromise.of)({
+      retrieveAssetSizes: () => RightReaderPromise({
         'app.js': {
           size: 20,
           path: 'dist/app.js'
@@ -152,7 +154,7 @@ test('handles invalid failure threshold case', () => {
   const logErrorSpy = createSpy();
 
   return subject({
-    getFileStats: R.pipe(a => Promise.resolve(a), R.always)({size: 32432}),
+    getFileStats: Promise.resolve({size: 32432}) |> R.always,
     logError: logErrorSpy,
     readManifest: () => ReaderPromise.of({'app.js': 'app.js'}),
     failureThresholds: [{targets: '.css', maxSize: 45}]
@@ -226,7 +228,7 @@ test('saves stats to local db when project name is given', () => {
         size: 983,
         path: 'dist/app.js'
       }]),
-      retrieveAssetSizes: () => R.pipe(Either.Right, ReaderPromise.of)({
+      retrieveAssetSizes: () => RightReaderPromise({
         'other-proj': {
           'app.js': {
             size: 300,

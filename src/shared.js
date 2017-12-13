@@ -10,7 +10,7 @@ import {JSON_OUTPUT_SPACING} from './core/constants';
 export const compact = list => R.reject(item => !item, list);
 
 export const compactAndJoin = (separator, list) =>
-  R.pipe(compact, R.join(separator))(list);
+  list |> compact |> R.join(separator);
 
 export const unthrow = fn => (...args) => {
   try {

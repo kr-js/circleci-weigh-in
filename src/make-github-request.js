@@ -40,21 +40,17 @@ export default ({path, fetchOpts = {}}) => {
       ...R.omit(['headers', 'body'], fetchOpts)
     })
       .catch(response =>
-        R.pipe(GitHubFetchErr, a => Promise.reject(a))(url, response)
+        GitHubFetchErr(url, response) |> a => Promise.reject(a)
       ).then(response => {
         if(response.ok) {
           return response.json();
         } else if(isAuthError(response.status)) {
-          return R.pipe(GitHubAuthorizationErr, a => Promise.reject(a))(
-            url,
-            response.statusText
-          );
+          return GitHubAuthorizationErr(url, response.statusText)
+            |> a => Promise.reject(a);
         }
 
-        return R.pipe(GitHubInvalidResponseErr, a => Promise.reject(a))(
-          url,
-          response.statusText
-        );
+        return GitHubInvalidResponseErr(url, response.statusText)
+          |> a => Promise.reject(a);
       }).then(deserializer);
   });
 };

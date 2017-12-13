@@ -71,11 +71,9 @@ const circleCiWeighInUnchecked = opts => {
   );
 
   if(!isfailureThresholdsValid) {
-    return R.pipe(
-      validator.errorsText,
-      InvalidFailureThresholdOptionErr,
-      ReaderPromise.fromError
-    )(validator.errors, {separator: '\n'});
+    return validator.errorsText(validator.errors, {separator: '\n'})
+      |> InvalidFailureThresholdOptionErr
+      |> ReaderPromise.fromError;
   }
 
   const retrieveAssetSizes2 = () =>
@@ -160,10 +158,9 @@ const circleCiWeighInUnchecked = opts => {
 
       const thresholdFailures = getThresholdFailures({
         failureThresholds,
-        assetStats: R.pipe(
-          R.toPairs,
-          R.map(([filepath, {current: size}]) => ({filepath, size}))
-        )(assetDiffs)
+        assetStats: assetDiffs
+          |> R.toPairs
+          |> R.map(([filepath, {current: size}]) => ({filepath, size}))
       });
 
       if(thresholdFailures.isLeft()) {

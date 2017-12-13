@@ -16,16 +16,16 @@ export default ({assetDiffs, thresholdFailures, targetUrl = '', label}) => ({
     ? StatusStates.SUCCESS
     : StatusStates.FAILURE,
   targetUrl,
-  description: R.pipe(
-    R.join(' \n'),
-    truncate({maxSize: MAX_DESCRIPTION_LENGTH})
-  )(
-    R.isEmpty(thresholdFailures)
+  description: (
+    (R.isEmpty(thresholdFailures)
       ? R.toPairs(assetDiffs)
         .map(([filename, assetDiff]) =>
           formatAssetDiff({filename, ...assetDiff})
         )
       : thresholdFailures.map(({message}) => message)
+    )
+    |> R.join(' \n')
+    |> truncate({maxSize: MAX_DESCRIPTION_LENGTH})
   ),
   context: label
 });
